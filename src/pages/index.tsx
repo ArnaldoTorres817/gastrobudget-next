@@ -4,8 +4,10 @@ import Image from 'next/image'
 import Header from '@/components/Header'
 import styles from '@/styles/Home.module.css'
 import Form from '@/components/Form'
+import { useLazyBusinessesSearchQuery } from '@/store/slices/apiSlice'
 
 const Home: NextPage = () => {
+  const [_, result] = useLazyBusinessesSearchQuery()
   return (
     <>
       <Head>
@@ -24,6 +26,8 @@ const Home: NextPage = () => {
           <p>Find your delights.</p>
         </section>
         <Form />
+        {result.isSuccess && <pre>{JSON.stringify(result.data, null, 4)}</pre>}
+        {result.isError && <p>An error has occurred.</p>}
       </main>
 
       <footer className="">
