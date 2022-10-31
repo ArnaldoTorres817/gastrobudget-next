@@ -2,10 +2,10 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { BusinessesSearchParams } from '@/types/businessesSearchParams'
 import type { Business } from '@/types/business'
 
-const BASE_URL = 'http://localhost:3000/api'
+const BASE_PATH = '/api'
 
 export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: fetchBaseQuery({ baseUrl: BASE_PATH }),
   endpoints: (builder) => ({
     businessesSearch: builder.query<Business[], BusinessesSearchParams>({
       query: ({ category, priceLevel, location }) => ({
@@ -14,6 +14,9 @@ export const api = createApi({
           categories: category,
           location: location,
           price: priceLevel,
+        },
+        headers: {
+          authorization: `Bearer ${process.env.NEXT_PUBLIC_YELP_API_KEY}`,
         },
       }),
       transformResponse: (res: { businesses: Business[] }) => res.businesses,
