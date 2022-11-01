@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { BusinessesSearchParams } from '@/types/businessesSearchParams'
+import type { BusinessesSearchParams } from '@/types/businessesSearchParams'
 import type { Business } from '@/types/business'
 
 const BASE_PATH = '/api'
