@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type { BusinessesSearchParams } from '@/types/businessesSearchParams'
 import type { Business } from '@/types/business'
+import type { Location } from '@/types/location'
 
 const BASE_PATH = '/api'
 
@@ -21,7 +22,24 @@ export const api = createApi({
       }),
       transformResponse: (res: { businesses: Business[] }) => res.businesses,
     }),
+    locationAutocomplete: builder.query<Location[], string>({
+      query: (text) => ({
+        url: '/geocode/autocomplete',
+        params: {
+          text,
+          type: 'city',
+          lang: 'en',
+          format: 'json',
+          filter: 'countrycode:pr,us',
+          apiKey: process.env.NEXT_PUBLIC_GEOAPIFY_API_KEY,
+        },
+      }),
+      transformResponse: (res: { results: Location[] }) => res.results,
+    }),
   }),
 })
 
-export const { useLazyBusinessesSearchQuery } = api
+export const {
+  useLazyBusinessesSearchQuery,
+  useLazyLocationAutocompleteQuery,
+} = api
