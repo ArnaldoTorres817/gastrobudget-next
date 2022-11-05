@@ -1,0 +1,16 @@
+{
+  "name": "GastroBudget",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {
+    "editor.formatOnSave": true
+  },
+  "extensions": [
+    "esbenp.prettier-vscode",
+    "mhutchie.git-graph",
+    "dbaeumer.vscode-eslint",
+    "rangav.vscode-thunder-client",
+    "bradlc.vscode-tailwindcss"
+  ]
+}
