@@ -1,4 +1,5 @@
 export interface Location {
+  dependency: string
   datasource: Datasource
   city: string
   county: string

@@ -26,7 +26,7 @@ export const api = createApi({
       query: (text) => ({
         url: '/geocode/autocomplete',
         params: {
-          text,
+          text: text.normalize(),
           type: 'city',
           lang: 'en',
           format: 'json',

@@ -1,35 +1,82 @@
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { useLazyLocationAutocompleteQuery } from '@/store/slices/apiSlice'
+import {
+  reset as resetLocation,
+  update as updateLocation,
+  selectLocation,
+} from '@/store/slices/locationSlice'
+
+import { debounce } from '@/utils/debounce'
+import { formatLocation } from '@/utils/formatLocation'
+
 import {
   CloseSmall as CloseIcon,
   LocalTwo as LocationIcon,
 } from '@icon-park/react'
 
-import type { FC, ChangeEvent } from 'react'
+import type { FC, ChangeEvent, FocusEvent } from 'react'
 import type { Location } from '@/types/location'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import {
-  reset as resetLocation,
-  selectLocation,
-  update as updateLocation,
-} from '@/store/slices/locationSlice'
 
 const LocationAutocompleteInput: FC = () => {
   const location = useAppSelector(selectLocation)
   const dispatch = useAppDispatch()
+  const [trigger, result] = useLazyLocationAutocompleteQuery()
 
-  function getFormattedLocation(location: Location): string {
-    if (location.city !== undefined) {
-      return `${location.city}, ${location.state}`
-    }
+  const [showSuggestions, setShowSuggestions] = useState(false)
 
-    return `${location.state}, ${location.country}`
+  const isHidden =
+    isEmpty(location) || result.isFetching || !result.data || !showSuggestions
+
+  function isEmpty(s: string) {
+    return s === ''
   }
 
-  function handleInput(e: ChangeEvent<HTMLInputElement>) {
-    dispatch(updateLocation(e.target.value))
+  function openSuggestions() {
+    setShowSuggestions(true)
+  }
+
+  function closeSuggestions() {
+    setShowSuggestions(false)
+  }
+
+  const fetchSuggestions = useCallback(
+    async (text: string) => {
+      if (isEmpty(text)) {
+        return
+      }
+
+      await trigger(text).unwrap()
+
+      openSuggestions()
+    },
+    [trigger]
+  )
+
+  const fetchSuggestionsDebounced = useMemo(
+    () => debounce(fetchSuggestions),
+    [fetchSuggestions]
+  )
+
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+    dispatch(updateLocation(e.currentTarget.value))
+    fetchSuggestionsDebounced(e.currentTarget.value)
+  }
+
+  function handleFocus(e: FocusEvent<HTMLInputElement>) {
+    fetchSuggestionsDebounced(e.currentTarget.value)
   }
 
   function handleBtnClearClick() {
     dispatch(resetLocation())
+  }
+
+  function handleSelect(selectedLocation: Location) {
+    const formatted = formatLocation(selectedLocation)
+
+    dispatch(updateLocation(formatted))
+
+    closeSuggestions()
   }
 
   return (
@@ -38,7 +85,8 @@ const LocationAutocompleteInput: FC = () => {
         <input
           type="text"
           value={location}
-          onChange={handleInput}
+          onChange={handleChange}
+          onFocus={handleFocus}
           placeholder="Enter a location."
           required
           className="w-full pl-4 pr-6 py-3 border rounded-xl focus-visible:outline-primary focus-visible:outline focus-visible:outline-2"
@@ -55,11 +103,21 @@ const LocationAutocompleteInput: FC = () => {
         </button>
       </div>
 
-      <ul className="hidden absolute top-full z-10 w-full max-h-52 py-3 mt-1 border rounded shadow bg-white overflow-auto">
-        <li className="px-4 py-2 flex items-center gap-2 hover:bg-zinc-200 cursor-pointer">
-          <LocationIcon size={20} />
-          {/* {getFormattedLocation(location)} */}
-        </li>
+      <ul
+        className={`${
+          isHidden && 'hidden'
+        } absolute top-full z-10 w-full max-h-52 py-3 mt-1 border rounded shadow bg-white overflow-auto`}
+      >
+        {result.data?.map((location) => (
+          <li
+            key={location.place_id}
+            className="px-4 py-2 flex items-center gap-2 hover:bg-zinc-200 cursor-pointer"
+            onClick={() => handleSelect(location)}
+          >
+            <LocationIcon size={20} />
+            {formatLocation(location)}
+          </li>
+        ))}
       </ul>
     </div>
   )
