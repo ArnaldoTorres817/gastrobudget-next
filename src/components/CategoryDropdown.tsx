@@ -16,6 +16,7 @@ const CategoryDropdown: FC = () => {
   return (
     <select
       value={category}
+      required
       onChange={handleChange}
       className="w-full sm:w-1/2 bg-white border py-2 px-3 rounded"
     >
