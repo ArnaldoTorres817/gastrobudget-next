@@ -23,6 +23,4 @@ RUN npm i -g pnpm
 # Switch to user
 USER ${uid}:${gid}
 
-WORKDIR /home/${user}/app
-
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
