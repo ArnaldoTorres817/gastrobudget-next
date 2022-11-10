@@ -12,6 +12,8 @@
     "mhutchie.git-graph",
     "dbaeumer.vscode-eslint",
     "rangav.vscode-thunder-client",
-    "bradlc.vscode-tailwindcss"
+    "bradlc.vscode-tailwindcss",
+    "vivaxy.vscode-conventional-commits",
+    "patbenatar.advanced-new-file"
   ]
 }
