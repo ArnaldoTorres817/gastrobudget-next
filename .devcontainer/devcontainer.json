@@ -1,6 +1,7 @@
 {
   "name": "GastroBudget",
   "forwardPorts": [3000],
+  "remoteUser": "node",
   "build": {
     "dockerfile": "Dockerfile"
   },
