@@ -24,7 +24,7 @@ stages:
           action: 'Build services'
           containerregistrytype: 'Azure Container Registry'
           azureSubscription: '$(AZ_SUBSCRIPTION)'
-          azureContainerRegistry: '$(AZ_REGISTRY)'
+          azureContainerRegistry: '$(REGISTRY_HOST)'
           dockerComposeFile: '$(Build.SourcesDirectory)/docker-compose.yml'
           dockerComposeFileArgs: |
             REGISTRY_HOST=$(REGISTRY_HOST)
