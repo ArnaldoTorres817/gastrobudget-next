@@ -1,9 +1,11 @@
 version: "3.8"
 services:
   web:
+    image: ${REGISTRY_URL}/gastrobudget-nextjs-web
     build:
       context: ./
   nginx:
+    image: ${REGISTRY_URL}/gastrobudget-nextjs-nginx
     restart: always
     build:
       context: ./nginx
