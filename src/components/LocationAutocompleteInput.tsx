@@ -118,6 +118,11 @@ const LocationAutocompleteInput: FC = () => {
             {formatLocation(location)}
           </li>
         ))}
+        {result.isError && (
+          <li className="px-4 py-2 flex items-center gap-2 hover:bg-zinc-200">
+            An error occurred.
+          </li>
+        )}
       </ul>
     </div>
   )
