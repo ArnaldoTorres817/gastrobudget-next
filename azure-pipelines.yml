@@ -19,10 +19,54 @@ stages:
     displayName: Build
     pool: Default
     steps:
-    - task: Docker@2
-      displayName: Build an image
-      inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-        tags: |
-          $(tag)
+      - task: DockerCompose@0
+        inputs:
+          action: 'Build services'
+          containerregistrytype: 'Azure Container Registry'
+          azureSubscription: '$(AZ_SUBSCRIPTION)'
+          azureContainerRegistry: '$(AZ_REGISTRY)'
+          dockerComposeFile: '$(Build.SourcesDirectory)/docker-compose.yml'
+          dockerComposeFileArgs: |
+            REGISTRY_HOST=$(REGISTRY_HOST)
+            NGINX_PORT=$(NGINX_PORT)
+            NEXT_PUBLIC_YELP_API_KEY=$(YELP_API_KEY)
+            NEXT_PUBLIC_GEOAPIFY_API_KEY=$(GEOAPIFY_API_KEY)
+          includeLatestTag: true
+      - task: DockerCompose@0
+        displayName: Push services
+        inputs:
+          action: Push services
+          azureSubscriptionEndpoint: $(AZ_SUBSCRIPTION)
+          azureContainerRegistry: $(AZ_REGISTRY)
+          dockerComposeFile: '$(Build.SourcesDirectory)/docker-compose.yml'
+          projectName: $(Build.Repository.Name)
+          qualifyImageNames: true
+          additionalImageTags: $(Build.BuildId)
+          dockerComposeFileArgs: |
+            REGISTRY_HOST=$(REGISTRY_HOST)
+  
+  - deployment: VMDeploy
+    displayName: Deploy
+    pool: Default
+    environment:
+      name: GastroBudget
+      resourceType: VirtualMachine
+      tags: web
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: DockerCompose@0
+              displayName: Run services
+              inputs:
+                action: Run services
+                azureSubscriptionEndpoint: $(AZ_SUBSCRIPTION)
+                azureContainerRegistry: $(AZ_REGISTRY)
+                dockerComposeFile: '$(Build.SourcesDirectory)/docker-compose.yml'
+                projectName: $(Build.Repository.Name)
+                qualifyImageNames: true
+                buildImages: true
+                abortOnContainerExit: true
+                detached: false
+                dockerComposeFileArgs: |
+                  REGISTRY_HOST=$(REGISTRY_HOST)
