@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  web:
+    build:
+      context: ./
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+    environment:
+      - NGINX_PORT=${NGINX_PORT}
+    ports:
+      - "${NGINX_PORT}:80"
