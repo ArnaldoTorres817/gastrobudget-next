@@ -25,8 +25,19 @@ const LocationAutocompleteInput: FC = () => {
 
   const [showSuggestions, setShowSuggestions] = useState(false)
 
-  const isHidden =
-    isEmpty(location) || result.isFetching || !result.data || !showSuggestions
+  const shouldLocationsBeHidden =
+    isEmpty(location) || !showSuggestions || result.isFetching || !result.data
+
+  const locationsJsx = result.data?.map((location) => (
+    <li
+      key={location.place_id}
+      className="px-4 py-2 flex items-center gap-2 hover:bg-zinc-200 cursor-pointer"
+      onClick={() => handleSelect(location)}
+    >
+      <LocationIcon size={20} />
+      {formatLocation(location)}
+    </li>
+  ))
 
   function isEmpty(s: string) {
     return s === ''
@@ -105,19 +116,10 @@ const LocationAutocompleteInput: FC = () => {
 
       <ul
         className={`${
-          isHidden && 'hidden'
+          shouldLocationsBeHidden && 'hidden'
         } absolute top-full z-10 w-full max-h-52 py-3 mt-1 border rounded shadow bg-white overflow-auto`}
       >
-        {result.data?.map((location) => (
-          <li
-            key={location.place_id}
-            className="px-4 py-2 flex items-center gap-2 hover:bg-zinc-200 cursor-pointer"
-            onClick={() => handleSelect(location)}
-          >
-            <LocationIcon size={20} />
-            {formatLocation(location)}
-          </li>
-        ))}
+        {locationsJsx}
         {result.isError && (
           <li className="px-4 py-2 flex items-center gap-2 hover:bg-zinc-200">
             An error occurred.

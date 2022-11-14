@@ -1,4 +1,4 @@
-import { Location } from '@/types/location'
+import type { Location } from '@/types/location'
 
 export function formatLocation(location: Location): string {
   if (location.city) {
